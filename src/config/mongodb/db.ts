@@ -1,8 +1,12 @@
 import mongoose from "mongoose";
-
+require('dotenv').config();
 export const connectMongoDB = async () => {
   try {
-    const URI = "mongodb://localhost:27017/";
+    const URI = process.env.MONGO_URL;
+    if (!URI) {
+      console.error("MongoDB URI is not defined in the .env file.");
+      process.exit(1);
+    }
     const connOptions = {
       useNewUrlParser: true,
       useUnifiedTopology: true,

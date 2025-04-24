@@ -10,9 +10,9 @@ import {
 export class MongoUserRepository implements IUserRepository {
   async findAll(): Promise<IUserWithoutPassword[]> {
     const result = await UserModel.find();
-    return result.map(({ id, name, email, role }) => ({
+    return result.map(({ id, full_name, email, role }) => ({
       id,
-      name,
+      full_name,
       email,
       role,
     }));
@@ -22,8 +22,8 @@ export class MongoUserRepository implements IUserRepository {
     const result = await UserModel.findById(userId);
     if (!result) return null;
 
-    const { id, name, email, role }: IUserWithoutPassword = result;
-    return { id, name, email, role };
+    const { id, full_name, email, role }: IUserWithoutPassword = result;
+    return { id, full_name, email, role };
   }
 
   async findByEmail(email: string): Promise<IUser | null> {
@@ -33,13 +33,13 @@ export class MongoUserRepository implements IUserRepository {
   async create(user: Omit<IUser, "id">): Promise<IUserWithoutPassword> {
     const hashedPassword = await bcrypt.hash(user.password, 10);
     const newUser = new UserModel({
-      name: user.name,
+      full_name: user.full_name,
       email: user.email,
       password: hashedPassword,
       role: user.role,
     });
     await newUser.save();
-    const { id, name, email, role }: IUserWithoutPassword = newUser;
-    return { id, name, email, role };
+    const { id, full_name, email, role }: IUserWithoutPassword = newUser;
+    return { id, full_name, email, role };
   }
 }

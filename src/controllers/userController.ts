@@ -1,20 +1,14 @@
-import { NextFunction, Request, Response } from "express";
-import { IUser, IUserService } from "../interfaces/userInterface";
+import { Request, Response, NextFunction } from "express";
+import { IUserService } from "../interfaces/userInterface";
 import redisCache from "../services/cacheService";
-export class UserController {
-  private userService: IUserService;
 
-  constructor(userService: IUserService) {
-    this.userService = userService;
-  }
+export class UserController {
+  constructor(private userService: IUserService) {}
 
   async getAllUsers(req: Request, res: Response, next: NextFunction) {
     try {
-      console.log(req.baseUrl, req.originalUrl);
-
-      const result = await this.userService.getAllUsers();
-      res.json({ message: "Get all users.", data: result });
-      return;
+      const users = await this.userService.getAllUsers();
+      res.json({ message: "Get all users.", data: users });
     } catch (error) {
       next(error);
     }
@@ -23,8 +17,8 @@ export class UserController {
   async getUserById(req: Request, res: Response, next: NextFunction) {
     try {
       const cacheKey = `data:${req.method}:${req.originalUrl}`;
-
       const cacheData = await redisCache.get(cacheKey);
+
       if (cacheData) {
         res.json({
           message: "Cache: Get user by Id",
@@ -34,11 +28,10 @@ export class UserController {
       }
 
       const { id } = req.params;
-      const result = await this.userService.getUserById(id);
+      const user = await this.userService.getUserById(id);
+      await redisCache.set(cacheKey, JSON.stringify(user), 360);
 
-      await redisCache.set(cacheKey, JSON.stringify(result), 360);
-
-      res.json({ message: "Api: Get user by Id", data: result });
+      res.json({ message: "Api: Get user by Id", data: user });
     } catch (error) {
       next(error);
     }
@@ -46,16 +39,26 @@ export class UserController {
 
   async createUser(req: Request, res: Response, next: NextFunction) {
     try {
-      const { name, email, password, role }: Omit<IUser, "id"> = req.body;
-      const newUser = await this.userService.createUser({
-        name,
+      const {
         email,
         password,
         role,
+        full_name,
+        phone_number,
+        profile_picture,
+        address,
+      } = req.body;
+      const result = await this.userService.createUser({
+        email,
+        password,
+        role,
+        full_name,
+        phone_number,
+        profile_picture,
+        address,
       });
-      res
-        .status(201)
-        .json({ message: "A new user was created.", data: newUser });
+
+      res.status(201).json({ message: "A new user was created.", data: result });
     } catch (err) {
       console.log(err);
       next(err);

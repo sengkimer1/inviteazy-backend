@@ -10,7 +10,7 @@ export class AuthController {
 
   async login(req: Request, res: Response, next: NextFunction) {
     try {
-      const { email, password }: Omit<IUser, "id" | "role" | "name"> = req.body;
+      const { email, password }: Omit<IUser, "id" | "role" | "full_name"> = req.body;
       const result = await this.userService.login(email, password);
       res.status(200).json({ message: "Login successfully.", data: result });
     } catch (err) {
