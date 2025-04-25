@@ -27,36 +27,37 @@ export class InviteeController {
   }
 
   // Get invitee by ID
-  async getInviteeById(req: Request, res: Response): Promise<void> {
-    const { id } = req.params;
+  async getInviteeByEventId(req: Request, res: Response,next:NextFunction): Promise<void> {
+ 
     try {
-      const invitee = await this.inviteeService.getInviteeById(id);
-      if (invitee) {
-        res.status(200).json(invitee);
-      } else {
-        res.status(404).json({ message: `Invitee with ID ${id} not found.` });
-      }
+      const {eventId}= req.params;
+      const result = await this.inviteeService.getInviteeByEventId(eventId);
+
+     res.json({message:"Invitees retrieved by even ID.",data:result})
     } catch (error) {
       res.status(500).json({ message: "An error occurred while fetching the invitee." });
     }
   }
 
- 
-
   // Update an existing invitee by ID
-  async updateInvitee(req: Request, res: Response): Promise<void> {
-    const { id } = req.params;
-    const updatedInvitee: Partial<IInvitee> = req.body;
-
+  async updateInviteeStaus(req: Request, res: Response,next:NextFunction) {
     try {
-      const invitee = await this.inviteeService.updateInvitee(id, updatedInvitee);
-      if (invitee) {
-        res.status(200).json(invitee);
-      } else {
-        res.status(404).json({ message: `Invitee with ID ${id} not found for update.` });
-      }
+      const {inviteId}  = req.params;
+      const { status } = req.body;
+
+      console.log(inviteId,"=================================");
+      
+
+      // const validStatuses = [ "accept","maybe","No","Busy"];
+      // if (!validStatuses.includes(status)) {
+      // res.status(400).json({message: " Invaild status value"});
+      // return;
+      // }
+      const updated = await this.inviteeService.updateInviteeStatus(inviteId,status);
+      res.status(200).json({message: "invitee status updated.",data: updated})
     } catch (error) {
       res.status(500).json({ message: "An error occurred while updating the invitee." });
+      next(error);
     }
   }
 }

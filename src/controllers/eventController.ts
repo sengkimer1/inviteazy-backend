@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { v4 as uuidv4 } from 'uuid';
 import { IEvent,IEventService } from "../interfaces/eventInterface";
 import { IInviteeService } from "../interfaces/inviteesInterface";
+import { promises } from "dns";
 interface AuthentciatedRequest extends Request{
   user?: {id :string}
 }
@@ -83,4 +84,42 @@ export class EventController {
         
     }
   }
+  async getGuestInsights(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const event_id = req.params.event_id;
+      const insights = await this.inviteeService.getInviteeByEventId(event_id);
+  
+      const statusCounts = {
+        totalInvited: insights.length,
+        accept: 0,
+        pending: 0,
+        no: 0,
+        busy: 0,
+        maybe: 0,
+        attended: 0,
+        totalContribution: 0,
+        totalGiftMoney: 0,
+      };
+  
+      for (const invite of insights) {
+        const status = invite.status;
+        if (status in statusCounts) {
+          statusCounts[status as keyof typeof statusCounts]++;
+        }
+        if (invite.is_checked_in) {
+          statusCounts.attended++;
+        }
+        if (invite.gift_money) {
+          statusCounts.totalGiftMoney += Number(invite.gift_money);
+        }
+      }
+  
+      res.status(200).json({ data: statusCounts });
+  
+    } catch (error) {
+      console.log("Error fetching guest insights:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  }
+  
 }

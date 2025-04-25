@@ -15,15 +15,15 @@ export interface IInvitee {
 
 export interface IInviteesRepository {
   findAll(): Promise<IInvitee[]>;
-  findById(id: string): Promise<IInvitee | null>;
+  findByEventId(eventId: string): Promise<IInvitee []>;
   create(invitee: Omit<IInvitee,"id" | "created_at">): Promise<IInvitee>;
-  update(id: string, invitee: Partial<IInvitee>): Promise<IInvitee>;
+  updateStatus(inviteeId: string, status: string): Promise<IInvitee>;
 }
 
 export interface IInviteeService {
   // findInvitesByUserId(userId: any): unknown;
   // getUserById(userId: any): unknown;
   getAllInvitees(): Promise<IInvitee[]>;
-  getInviteeById(id: string): Promise<IInvitee | null>;
+  getInviteeByEventId(eventId: string): Promise<IInvitee[]>;
   createInvitee(invitee: Omit<IInvitee,"id" | "created_at">): Promise<IInvitee>;
-  updateInvitee(id: string, invitee: Partial<IInvitee>): Promise<IInvitee | null>;}
+  updateInviteeStatus(inviteeId: string, status:string): Promise<IInvitee>;}
