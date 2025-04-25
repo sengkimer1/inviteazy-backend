@@ -15,12 +15,12 @@ export class InviteeService implements IInviteeService {
     return await this.inviteesRepository.findAll();
   }
 
-  async getInviteeById(id: string): Promise<IInvitee | null> {
-    return await this.inviteesRepository.findById(id);
+  async getInviteeByEventId(eventId: string): Promise<IInvitee[]> {
+    return await this.inviteesRepository.findByEventId(eventId);
   }
 
-  async updateInvitee(id: string, updates: Partial<IInvitee>): Promise<IInvitee | null> {
-    return await this.inviteesRepository.update(id, updates);
+  async updateInviteeStatus(inviteeId: string, status:string): Promise<IInvitee> {
+    return await this.inviteesRepository.updateStatus(inviteeId, status);
   }
 
 }
