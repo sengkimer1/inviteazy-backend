@@ -7,8 +7,21 @@ export class UserController {
 
   async getAllUsers(req: Request, res: Response, next: NextFunction) {
     try {
+      const cacheKey = `data:${req.method}:${req.originalUrl}`;
+      const cacheData = await redisCache.get(cacheKey);
+  
+      if (cacheData) {
+        res.json({
+          message: "Cache: Get all users",
+          data: JSON.parse(cacheData),
+        });
+        return;
+      }
+  
       const users = await this.userService.getAllUsers();
-      res.json({ message: "Get all users.", data: users });
+      await redisCache.set(cacheKey, JSON.stringify(users), 360); // cache for 6 minutes
+  
+      res.json({ message: "Api: Get all users", data: users });
     } catch (error) {
       next(error);
     }

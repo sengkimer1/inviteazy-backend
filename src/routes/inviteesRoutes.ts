@@ -2,7 +2,6 @@ import { Router } from "express";
 import { InviteeController } from "../controllers/inviteesController";
 import { authMiddleware } from "../middlewares/authMiddleware";
 
-// import { validateInvitees,validateIdInInvitees } from "../middlewares/validationInvitees";
 export default function inviteeRoutes(controller: InviteeController): Router {
   const router = Router();
 
@@ -16,6 +15,8 @@ export default function inviteeRoutes(controller: InviteeController): Router {
   //check in
   router.patch("/checkin/:inviteId",authMiddleware,controller.updateCheckInStatus.bind(controller));
   router.patch("/checkout/:inviteId",authMiddleware,controller.updateCheckOutStatus.bind(controller));
+  // router.get("/:id",authMiddleware,controller.getInviteeById.bind(controller));
+  // router.put("/:id",authMiddleware,controller.updateInvitee.bind(controller));
 
   return router;
 }
