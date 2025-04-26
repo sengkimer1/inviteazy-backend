@@ -21,7 +21,7 @@ export class PostgresEventRepository implements IEventRepository {
   async create(event: IEvent): Promise<IEvent> {
     const {id,  user_id, event_name, event_datetime, location, description, created_at, updated_at } = event;
     const { rows } = await this.pool.query<IEvent>(
-      `INSERT INTO events (id, user_id, event_name, event_datetime, location, description, created_at, updated_at)
+      `INSERT INTO events (id, user_id, event_name, event_date, location, description, created_at, updated_at)
       VALUES ($1, $2, $3, $4, $5, $6, $7,$8)
       RETURNING *`,
       [id,user_id, event_name, event_datetime, location, description, created_at, updated_at]

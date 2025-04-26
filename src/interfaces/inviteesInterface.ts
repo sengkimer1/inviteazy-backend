@@ -18,6 +18,9 @@ export interface IInviteesRepository {
   findByEventId(eventId: string): Promise<IInvitee []>;
   create(invitee: Omit<IInvitee,"id" | "created_at">): Promise<IInvitee>;
   updateStatus(inviteeId: string, status: string): Promise<IInvitee>;
+  updataCheckInStatus(inviteeId: string, is_checked_in:boolean): Promise<IInvitee>;
+  updateCheckOutStatus(inviteeId: string, is_checked_out:boolean): Promise<IInvitee>;
+  findById(id: string): Promise<IInvitee | null>;
 }
 
 export interface IInviteeService {
@@ -26,4 +29,9 @@ export interface IInviteeService {
   getAllInvitees(): Promise<IInvitee[]>;
   getInviteeByEventId(eventId: string): Promise<IInvitee[]>;
   createInvitee(invitee: Omit<IInvitee,"id" | "created_at">): Promise<IInvitee>;
-  updateInviteeStatus(inviteeId: string, status:string): Promise<IInvitee>;}
+  updateInviteeStatus(inviteeId: string, status:string): Promise<IInvitee>;
+  updataCheckInStatus(inviteeId: string, is_checked_in:boolean): Promise<IInvitee>;
+  updateCheckOutStatus(inviteeId: string, is_checked_out:boolean): Promise<IInvitee>;
+  findById(id: string): Promise<IInvitee | null>;
+}
+  
