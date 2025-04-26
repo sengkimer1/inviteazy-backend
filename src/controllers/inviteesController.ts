@@ -15,7 +15,7 @@ export class InviteeController {
     this.inviteeService = inviteeService;
     
   }
-
+  
   // Get all invitees
   async getAllInvitees(req: Request, res: Response): Promise<void> {
     try {
@@ -57,6 +57,59 @@ export class InviteeController {
       res.status(200).json({message: "invitee status updated.",data: updated})
     } catch (error) {
       res.status(500).json({ message: "An error occurred while updating the invitee." });
+      next(error);
+    }
+  }
+
+  // async updateCheckInStatus(req: Request, res: Response, next: NextFunction) {
+  //   try {
+  //     const { inviteId } = req.params;
+  //     const updatedInvitee = await this.inviteeService.updataCheckInStatus(inviteId);
+  //     res.status(200).json({ message: "Check-in status updated.", data: updatedInvitee });
+  //   } catch (error) {
+  //     res.status(500).json({ message: "An error occurred while updating the check-in status." });
+  //     next(error);
+  //   }
+  // }
+  async updateCheckInStatus(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { inviteId } = req.params;
+  
+      const invitee = await this.inviteeService.findById(inviteId);
+  
+      if (!invitee) {
+        res.status(404).json({ message: "Invitee not found." });
+        return;
+      }
+  
+      const newCheckInStatus = !invitee.is_checked_in;
+  
+      const updatedInvitee = await this.inviteeService.updataCheckInStatus(inviteId, newCheckInStatus);
+  
+      res.status(200).json({
+        message: `Check-in status updated to ${newCheckInStatus}`,
+        data: updatedInvitee,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateCheckOutStatus(req: Request, res: Response, next: NextFunction) {
+    try {
+      const {inviteId} = req.params;
+      const invitee = await this.inviteeService.findById(inviteId);
+      if (!invitee) {
+        res.status(404).json({ message: "Invitee not found." });
+        return;
+      }
+      const newCheckOutStatus = !invitee.is_checked_out;
+      const updatedInvitee = await this.inviteeService.updateCheckOutStatus(inviteId, newCheckOutStatus);
+      res.status(200).json({
+        message: `Check-out status updated to ${newCheckOutStatus}`,
+        data: updatedInvitee,
+      });
+    } catch (error) {
       next(error);
     }
   }

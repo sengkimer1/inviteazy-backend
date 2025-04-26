@@ -15,6 +15,14 @@ export class PostgresInviteesRepository implements IInviteesRepository {
     return rows;
   }
 
+  async findById(id: string): Promise<IInvitee | null> {
+    const { rows } = await queryWithLogging(
+      this.pool,
+      `SELECT * FROM invitees WHERE id = $1`, 
+      [id]
+    );
+    return rows[0]|| null; 
+  }
   async findByEventId(eventId: string): Promise<IInvitee[]> {
     const { rows } = await queryWithLogging(
       this.pool,
@@ -57,5 +65,30 @@ export class PostgresInviteesRepository implements IInviteesRepository {
       [status, inviteeId]
     );
     return rows[0];
+  }
+
+  async updataCheckInStatus(inviteeId: string, is_checked_in: boolean): Promise<IInvitee> {
+    return queryWithLogging(
+      this.pool,
+      `UPDATE invitees 
+       SET is_checked_in = $1, 
+           checked_in_at = CASE WHEN $1 THEN NOW() ELSE NULL END
+       WHERE id = $2 
+       RETURNING *`,
+      [is_checked_in, inviteeId]
+    ).then((result) => result.rows[0]);
+  }
+  
+  
+  async updateCheckOutStatus(inviteeId: string, is_checked_out: boolean): Promise<IInvitee> {
+    return queryWithLogging(
+      this.pool,
+      `UPDATE invitees 
+       SET is_checked_out = $1, 
+           checked_out_at = CASE WHEN $1 THEN NOW() ELSE NULL END
+       WHERE id = $2 
+       RETURNING *`,
+      [is_checked_out, inviteeId]
+    ).then((result) => result.rows[0]);
   }
 }
