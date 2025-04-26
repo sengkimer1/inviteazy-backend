@@ -12,7 +12,7 @@ export interface IUserDocument extends Document {
   updatedAt?: Date;
 }
 
-const userSchema: Schema = new Schema(
+const userSchema: Schema = new Schema<IUserDocument>(
   {
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },

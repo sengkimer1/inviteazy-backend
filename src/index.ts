@@ -54,8 +54,8 @@ app.use(loggingMiddleware);
 // Routes
 app.use("/api/users", userRoutes(userController));
 app.use("/api/auth", authRoutes(authController));
-app.use("/api/events", eventRoutes(eventController)); 
-app.use("/api/invitees", inviteeRoutes(inviteeController));
+app.use("/api/v1/events", eventRoutes(eventController)); 
+app.use("/api/v1/invitees", inviteeRoutes(inviteeController));
 
 // Handle Errors
 app.use(errorMiddleware);
