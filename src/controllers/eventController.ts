@@ -4,6 +4,7 @@ import { IEvent,IEventService } from "../interfaces/eventInterface";
 import { IInviteeService } from "../interfaces/inviteesInterface";
 import { promises } from "dns";
 import redisCache from "../services/cacheService";
+
 interface AuthentciatedRequest extends Request{
   user?: {id :string}
 }
@@ -16,15 +17,31 @@ export class EventController {
   // constructor(eventService: IEventService) {
   //   this.eventService = eventService;
   // }
-
   async getAllEvents(req: Request, res: Response): Promise<void> {
+    const cacheKey = `data:${req.method}:${req.originalUrl}`;
+  
     try {
+      const cachedData = await redisCache.get(cacheKey);
+      if (cachedData) {
+        res.status(200).json({
+          message: "Cache: All events retrieved.",
+          data: JSON.parse(cachedData),
+        });
+        return;
+      }
+  
       const events = await this.eventService.getAllEvents();
-      res.status(200).json(events);
+      await redisCache.set(cacheKey, JSON.stringify(events), 360);
+  
+      res.status(200).json({
+        message: "API: All events retrieved.",
+        data: events,
+      });
     } catch (error) {
       res.status(500).json({ message: "An error occurred while fetching events." });
     }
   }
+  
 
   // async getEventById(req: Request, res: Response): Promise<void> {
   //   const { id } = req.params;
@@ -40,6 +57,7 @@ export class EventController {
   //   }
   // }
   async getEventById(req: Request, res: Response): Promise<void> {
+
     try {
       const cacheKey = `data:${req.method}:${req.originalUrl}`;
       const cacheData = await redisCache.get(cacheKey);
@@ -48,17 +66,34 @@ export class EventController {
         res.json({
           message: "Cache: Get event by Id",
           data: JSON.parse(cacheData),
+
+    const { id } = req.params;
+    const cacheKey = `data:${req.method}:${req.originalUrl}`;
+  
+    try {
+      const cachedData = await redisCache.get(cacheKey);
+      if (cachedData) {
+        res.status(200).json({
+          message: `Cache: Event with ID ${id} retrieved.`,
+          data: JSON.parse(cachedData),
+
         });
         return;
       }
   
+
       const { id } = req.params;
+
       const event = await this.eventService.getEventById(id);
   
       if (event) {
         await redisCache.set(cacheKey, JSON.stringify(event), 360);
-        res.status(200).json({ message: "API: Get event by Id", data: event });
-      } else {
+
+        res.status(200).json({
+          message: `API: Event with ID ${id} retrieved.`,
+          data: event,
+        });
+]      } else {
         res.status(404).json({ message: `Event with ID ${id} not found.` });
       }
     } catch (error) {

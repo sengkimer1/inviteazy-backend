@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 
-import { UserModel } from "../../models/userModel";
+import { UserModel } from "../mongodb/models/userModel";
 import {
   IUser,
   IUserRepository,
@@ -10,11 +10,14 @@ import {
 export class MongoUserRepository implements IUserRepository {
   async findAll(): Promise<IUserWithoutPassword[]> {
     const result = await UserModel.find();
-    return result.map(({ id, full_name, email, role }) => ({
+    return result.map(({ id, full_name, email, role ,phone_number,profile_picture,address}) => ({
       id,
       full_name,
       email,
       role,
+      phone_number,
+      profile_picture,
+      address
     }));
   }
 
@@ -37,9 +40,12 @@ export class MongoUserRepository implements IUserRepository {
       email: user.email,
       password: hashedPassword,
       role: user.role,
+      phone_number:user.phone_number,
+      profile_picture:user.profile_picture,
+      address: user.address
     });
     await newUser.save();
-    const { id, full_name, email, role }: IUserWithoutPassword = newUser;
-    return { id, full_name, email, role };
+    const { id, full_name, email, role,phone_number ,profile_picture,address}: IUserWithoutPassword = newUser;
+    return { id, full_name, email, role,phone_number,profile_picture,address };
   }
 }
