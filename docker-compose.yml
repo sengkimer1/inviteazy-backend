@@ -1,0 +1,15 @@
+services:
+  app:
+    build: .
+    ports:
+      - "4000:3000"
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+      - PORT=${PORT}
+      - NODE_ENV=${NODE_ENV}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - REDIS_URL=${REDIS_URL}
+      - MONGO_URL=${MONGO_URL}
