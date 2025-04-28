@@ -2,7 +2,10 @@ import mongoose from "mongoose";
 require('dotenv').config();
 export const connectMongoDB = async () => {
   try {
-    const URI = process.env.MONGO_URL;
+
+    // const URI = process.env.MONGO_URL;
+    const URI ="mongodb+srv://kimerseng:Kimer-2106@cms.fqqcv.mongodb.net/?retryWrites=true&w=majority&appName=CMS";
+
     if (!URI) {
       console.error("MongoDB URI is not defined in the .env file.");
       process.exit(1);

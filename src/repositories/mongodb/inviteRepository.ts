@@ -1,82 +1,80 @@
-// import { InviteeModel, IInviteeDocument } from "../mongodb/models/inviteModel";
-// import { IInvitee, IInviteesRepository } from "../../interfaces/inviteesInterface";
+import { InviteeModel, IInviteeDocument } from "../mongodb/models/inviteModel";
+import { IInvitee, IInviteesRepository } from "../../interfaces/inviteesInterface";
 
-// export class MongoInviteesRepository implements IInviteesRepository {
-//   async findAll(): Promise<IInvitee[]> {
-//     const invitees: IInviteeDocument[] = await InviteeModel.find();
-//     return invitees.map((invitee) => ({
-//       id: invitee.id.toString(),
-//       event_id: invitee.event_id.toString(),
-//       user_id: invitee.user_id?.toString(),
-//       status: invitee.status,
-//       qr_code: invitee.qr_code,
-//       is_checked_in: invitee.is_checked_in,
-//       checked_in_at: invitee.checked_in_at || undefined,
-//       is_checked_out: invitee.is_checked_out,
-//       checked_out_at: invitee.checked_out_at || undefined,
-//       gift_money: invitee.gift_money,
-//       created_at: invitee.createdAt,
-//       updated_at: invitee.updatedAt,
-//     }));
-//   }
+export class MongoInviteesRepository implements IInviteesRepository {
+  
+  async findAll(): Promise<IInvitee[]> {
+    const invitees: IInviteeDocument[] = await InviteeModel.find();
+    return invitees.map(this.mapInviteeDocumentToInvitee);
+  }
 
-//   async findById(id: string): Promise<IInvitee | null> {
-//     const invitee = await InviteeModel.findById(id);
-//     if (!invitee) return null;
+  async findById(id: string): Promise<IInvitee | null> {
+    const invitee = await InviteeModel.findById(id);
+    if (!invitee) return null;
+    return this.mapInviteeDocumentToInvitee(invitee);
+  }
 
-//     return {
-//       id: invitee.id.toString(),
-//       event_id: invitee.event_id.toString(),
-//       user_id: invitee.user_id?.toString(),
-//       status: invitee.status,
-//       qr_code: invitee.qr_code,
-//       is_checked_in: invitee.is_checked_in,
-//       checked_in_at: invitee.checked_in_at || undefined,
-//       is_checked_out: invitee.is_checked_out,
-//       checked_out_at: invitee.checked_out_at || undefined,
-//       gift_money: invitee.gift_money,
-//       created_at: invitee.createdAt,
-//       updated_at: invitee.updatedAt,
-//     };
-//   }
+  async findByEventId(eventId: string): Promise<IInvitee[]> {
+    const invitees = await InviteeModel.find({ event_id: eventId });
+    return invitees.map(this.mapInviteeDocumentToInvitee);
+  }
 
-//   async create(invitee: Omit<IInvitee, "id" | "created_at">): Promise<IInvitee> {
-//     const newInvitee = new InviteeModel(invitee);
-//     const saved = await newInvitee.save();
+  async create(invitee: Omit<IInvitee, "id" | "created_at" | "updated_at">): Promise<IInvitee> {
+    const newInvitee = new InviteeModel(invitee);
+    const saved = await newInvitee.save();
+    return this.mapInviteeDocumentToInvitee(saved);
+  }
 
-//     return {
-//       id: saved.id.toString(),
-//       event_id: saved.event_id.toString(),
-//       user_id: saved.user_id?.toString(),
-//       status: saved.status,
-//       qr_code: saved.qr_code,
-//       is_checked_in: saved.is_checked_in,
-//       checked_in_at: saved.checked_in_at || undefined,
-//       is_checked_out: saved.is_checked_out,
-//       checked_out_at: saved.checked_out_at || undefined,
-//       gift_money: saved.gift_money,
-//       created_at: saved.createdAt,
-//       updated_at: saved.updatedAt,
-//     };
-//   }
+  async updateStatus(inviteeId: string, status: 'pending' | 'accept' | 'maybe' | 'no' | 'busy'): Promise<IInvitee> {
+    const updated = await InviteeModel.findByIdAndUpdate(
+      inviteeId,
+      { status },
+      { new: true }
+    );
+    if (!updated) throw new Error("Invitee not found");
+    return this.mapInviteeDocumentToInvitee(updated);
+  }
 
-//   async update(id: string, invitee: Partial<IInvitee>): Promise<IInvitee> {
-//     const updated = await InviteeModel.findByIdAndUpdate(id, invitee, { new: true });
-//     if (!updated) throw new Error("Invitee not found");
+  async updataCheckInStatus(inviteeId: string, is_checked_in: boolean): Promise<IInvitee> {
+    const updated = await InviteeModel.findByIdAndUpdate(
+      inviteeId,
+      { 
+        is_checked_in,
+        checked_in_at: is_checked_in ? new Date() : undefined 
+      },
+      { new: true }
+    );
+    if (!updated) throw new Error("Invitee not found");
+    return this.mapInviteeDocumentToInvitee(updated);
+  }
 
-//     return {
-//       id: updated.id.toString(),
-//       event_id: updated.event_id.toString(),
-//       user_id: updated.user_id?.toString(),
-//       status: updated.status,
-//       qr_code: updated.qr_code,
-//       is_checked_in: updated.is_checked_in,
-//       checked_in_at: updated.checked_in_at || undefined,
-//       is_checked_out: updated.is_checked_out,
-//       checked_out_at: updated.checked_out_at || undefined,
-//       gift_money: updated.gift_money,
-//       created_at: updated.createdAt,
-//       updated_at: updated.updatedAt,
-//     };
-//   }
-// }
+  async updateCheckOutStatus(inviteeId: string, is_checked_out: boolean): Promise<IInvitee> {
+    const updated = await InviteeModel.findByIdAndUpdate(
+      inviteeId,
+      { 
+        is_checked_out,
+        checked_out_at: is_checked_out ? new Date() : undefined 
+      },
+      { new: true }
+    );
+    if (!updated) throw new Error("Invitee not found");
+    return this.mapInviteeDocumentToInvitee(updated);
+  }
+
+  private mapInviteeDocumentToInvitee(doc: IInviteeDocument): IInvitee {
+    return {
+      id: doc.id.toString(),
+      event_id: doc.event_id.toString(),
+      user_id: doc.user_id?.toString(),
+      status: doc.status,
+      qr_code: doc.qr_code,
+      is_checked_in: doc.is_checked_in,
+      checked_in_at: doc.checked_in_at,
+      is_checked_out: doc.is_checked_out,
+      checked_out_at: doc.checked_out_at,
+      gift_money: doc.gift_money,
+      created_at: doc.createdAt,
+      updated_at: doc.updatedAt,
+    };
+  }
+}

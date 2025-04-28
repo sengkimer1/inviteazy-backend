@@ -16,7 +16,7 @@ export interface IInviteeDocument extends Document {
 
 const InviteeSchema = new Schema<IInviteeDocument>(
   {
-    event_id: { type: Schema.Types.ObjectId, ref: "Event",  required: true,},
+    event_id: { type: Schema.Types.ObjectId, ref: "Event", required: true },
     user_id: { type: Schema.Types.ObjectId, ref: "User" },
     status: { type: String, enum: ['pending', 'accept', 'maybe', 'no', 'busy'], default: 'pending' },
     qr_code: { type: String },
