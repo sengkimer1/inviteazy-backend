@@ -28,16 +28,16 @@ const app = express();
 const port = 3000;
 
 // Switch connection to database
-connectMongoDB();
-// const pgPool = connectPostgresDb();
+// connectMongoDB();
+const pgPool = connectPostgresDb();
 
 // Repositories
-// const userRepository = new PostgresUserRepository(pgPool);
-// const eventRepository = new PostgresEventRepository(pgPool);
-// const inviteeRepository = new PostgresInviteesRepository(pgPool);
-const userRepository = new MongoUserRepository;
-const eventRepository = new MongoEventRepository;
-const inviteeRepository = new MongoInviteesRepository;
+const userRepository = new PostgresUserRepository(pgPool);
+const eventRepository = new PostgresEventRepository(pgPool);
+const inviteeRepository = new PostgresInviteesRepository(pgPool);
+// const userRepository = new MongoUserRepository;
+// const eventRepository = new MongoEventRepository;
+// const inviteeRepository = new MongoInviteesRepository;
 
 
 
