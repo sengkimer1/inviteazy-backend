@@ -1,6 +1,7 @@
 import { Pool, QueryResult } from "pg";
 import { IInvitee, IInviteesRepository } from "../../interfaces/inviteesInterface";
 import { queryWithLogging } from "./utils";
+import { v4 as uuidv4 } from 'uuid';
 
 
 export class PostgresInviteesRepository implements IInviteesRepository {
@@ -32,12 +33,13 @@ export class PostgresInviteesRepository implements IInviteesRepository {
     return rows; 
   }
   async create(invitee: IInvitee): Promise<IInvitee> {
+    const invitesId = uuidv4;
     const { event_id, user_id } = invitee;
     const { rows } = await this.pool.query<IInvitee>(
       `INSERT INTO invitees (event_id, user_id, status, qr_code, is_checked_in, checked_in_at, is_checked_out, checked_out_at)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING *`,
-      [event_id, user_id, "pending", "qwert", false, null, false, null]
+      [invitesId,event_id, user_id, "pending", "qwert", false, null, false, null]
     );
 
     return rows[0];

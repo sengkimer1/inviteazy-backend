@@ -2,6 +2,8 @@ import { Pool,QueryResult } from "pg";
 import bcrypt from "bcrypt";
 import { IUser, IUserRepository, IUserWithoutPassword } from "../../interfaces/userInterface";
 import { queryWithLogging } from "./utils";
+import { v4 as uuidv4 } from 'uuid';
+
 
 export class PostgresUserRepository implements IUserRepository {
   constructor(private pool: Pool) {}
@@ -34,13 +36,15 @@ export class PostgresUserRepository implements IUserRepository {
 
   async create(user: Omit<IUser, "id">): Promise<IUserWithoutPassword> {
     const hashedPassword = await bcrypt.hash(user.password, 10);
+    const userId = uuidv4()
     const { rows } = await queryWithLogging(
       this.pool,
       `INSERT INTO users 
-        (email, password, role, full_name, phone_number, profile_picture, address) 
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
+        (id ,email, password, role, full_name, phone_number, profile_picture, address) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7,$8)
        RETURNING id, email, role, full_name, phone_number, profile_picture, address`,
       [
+        userId,
         user.email,
         hashedPassword,
         user.role,

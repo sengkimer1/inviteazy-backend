@@ -1,6 +1,7 @@
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE users (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY ,
   email VARCHAR(255) NOT NULL UNIQUE,
   password TEXT NOT NULL,
   role VARCHAR(20) NOT NULL,
@@ -13,7 +14,7 @@ CREATE TABLE users (
 );
 
 CREATE TABLE events (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY ,
   user_id INTEGER NOT NULL REFERENCES users(id),
   event_name VARCHAR(255),
   event_datetime TIMESTAMP,
@@ -22,8 +23,18 @@ CREATE TABLE events (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ); 
+-- CREATE TABLE events (
+--   id UUID PRIMARY KEY,
+--   user_id UUID NOT NULL REFERENCES users(id),
+--   event_name VARCHAR(255),
+--   event_datetime TIMESTAMP,
+--   location VARCHAR(255),
+--   description TEXT,
+--   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+-- ); 
 CREATE TABLE invitees (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY ,
     event_id UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE,
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     status VARCHAR(20) NOT NULL CHECK (status IN ('pending', 'accept', 'maybe', 'no', 'busy')),
