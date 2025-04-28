@@ -6,7 +6,7 @@ export const connectPostgresDb = (): Pool => {
     host: "localhost",
     database: "mydb",
     password: "12345678",
-    port: 5433,
+    port: 5438,
   });
   return pool;
 };

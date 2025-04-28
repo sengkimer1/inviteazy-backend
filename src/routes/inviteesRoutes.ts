@@ -7,7 +7,7 @@ export default function inviteeRoutes(controller: InviteeController): Router {
 
   router.get( "/all", authMiddleware, controller.getAllInvitees.bind(controller) );
 
-  router.get("/event/:eventid",authMiddleware,controller.getInviteeByEventId.bind(controller));
+  // router.get("/event/:eventid",authMiddleware,controller.getInviteeByEventId.bind(controller));
 
   // Route to update an event
   router.patch("/:inviteId",authMiddleware,controller.updateInviteeStaus.bind(controller));

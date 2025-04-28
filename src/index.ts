@@ -19,6 +19,8 @@ import { PostgresEventRepository } from "./repositories/postgres/eventRepository
 import { InviteeService } from "./services/inviteeService";
 import { InviteeController } from "./controllers/inviteesController";
 import inviteeRoutes from "./routes/inviteesRoutes";
+import { MongoEventRepository } from "./repositories/mongodb/eventRepository";
+import { MongoInviteesRepository } from "./repositories/mongodb/inviteRepository";
 
 dotenv.config();
 
@@ -26,13 +28,17 @@ const app = express();
 const port = 3000;
 
 // Switch connection to database
-// connectMongoDB();
-const pgPool = connectPostgresDb();
+connectMongoDB();
+// const pgPool = connectPostgresDb();
 
 // Repositories
-const userRepository = new PostgresUserRepository(pgPool);
-const eventRepository = new PostgresEventRepository(pgPool);
-const inviteeRepository = new PostgresInviteesRepository(pgPool);
+// const userRepository = new PostgresUserRepository(pgPool);
+// const eventRepository = new PostgresEventRepository(pgPool);
+// const inviteeRepository = new PostgresInviteesRepository(pgPool);
+const userRepository = new MongoUserRepository;
+const eventRepository = new MongoEventRepository;
+const inviteeRepository = new MongoInviteesRepository;
+
 
 
 // Services
