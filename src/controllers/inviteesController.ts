@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { v4 as uuidv4 } from "uuid";
 import { IInvitee, IInviteeService } from "../interfaces/inviteesInterface";
 import { IUserService } from "../interfaces/userInterface";
+import redisCache from "../services/cacheService";
 
 interface AuthRequest extends Request {
   userId: string; // Assuming userId is always provided via middleware
@@ -27,17 +28,41 @@ export class InviteeController {
   }
 
   // Get invitee by ID
-  async getInviteeByEventId(req: Request, res: Response,next:NextFunction): Promise<void> {
+  // async getInviteeByEventId(req: Request, res: Response,next:NextFunction): Promise<void> {
  
-    try {
-      const {eventId}= req.params;
-      const result = await this.inviteeService.getInviteeByEventId(eventId);
+  //   try {
+  //     const {eventId}= req.params;
+  //     const result = await this.inviteeService.getInviteeByEventId(eventId);
 
-     res.json({message:"Invitees retrieved by even ID.",data:result})
+  //    res.json({message:"Invitees retrieved by even ID.",data:result})
+  //   } catch (error) {
+  //     res.status(500).json({ message: "An error occurred while fetching the invitee." });
+  //   }
+  // }
+  async getInviteeByEventId(req: Request, res: Response): Promise<void> {
+    try {
+      const cacheKey = `data:${req.method}:${req.originalUrl}`;
+      const cacheData = await redisCache.get(cacheKey);
+  
+      if (cacheData) {
+        res.json({
+          message: "Cache: Invitees retrieved by event ID",
+          data: JSON.parse(cacheData),
+        });
+        return;
+      }
+  
+      const { eventId } = req.params;
+      const result = await this.inviteeService.getInviteeByEventId(eventId);
+      await redisCache.set(cacheKey, JSON.stringify(result), 360);
+  
+      res.json({ message: "API: Invitees retrieved by event ID", data: result });
     } catch (error) {
-      res.status(500).json({ message: "An error occurred while fetching the invitee." });
+      res.status(500).json({ message: "An error occurred while fetching the invitees." });
     }
   }
+  
+  
 
   // Update an existing invitee by ID
   async updateInviteeStaus(req: Request, res: Response,next:NextFunction) {

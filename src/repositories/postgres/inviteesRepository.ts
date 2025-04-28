@@ -42,17 +42,6 @@ export class PostgresInviteesRepository implements IInviteesRepository {
 
     return rows[0];
   }
-
-  // async updateStutes(id: string, invitee: IInvitee): Promise<IInvitee> {
-  //   const { event_id, user_id, status, qr_code, is_checked_in, checked_in_at, created_at, updated_at } = invitee;
-  //   const { rows } = await this.pool.query<IInvitee>(
-  //     `UPDATE invitees SET event_id = $1, user_id = $2, status = $3, qr_code = $4, is_checked_in = $5, checked_in_at = $6, created_at = $7, updated_at = $8 
-  //     WHERE id = $9
-  //     RETURNING *`,
-  //     [event_id, user_id, status, qr_code, is_checked_in, checked_in_at, created_at, updated_at, id]
-  //   );
-  //   return rows[0] || null;
-  // }
   async updateStatus(inviteeId: string, status: string): Promise<IInvitee> {
     console.log("-------------------", status);
 
