@@ -45,6 +45,16 @@ export class InviteeController {
   }
   
 
+ 
+  // Get invitee by ID
+  // async getInviteeByEventId(req: Request, res: Response,next:NextFunction): Promise<void> {
+ 
+  //   try {
+  //     const {eventId}= req.params;
+  //     const result = await this.inviteeService.getInviteeByEventId(eventId);
+
+  //    res.json({message:"Invitees retrieved by even ID.",data:result})
+
   // // Get invitee by ID
   // async getInviteeById(req: Request, res: Response): Promise<void> {
   //   const { id } = req.params;
@@ -72,10 +82,33 @@ export class InviteeController {
   //     } else {
   //       res.status(404).json({ message: `Invitee with ID ${id} not found.` });
   //     }
-  //   } catch (error) {
+ //   } catch (error) {
   //     res.status(500).json({ message: "An error occurred while fetching the invitee." });
   //   }
   // }
+  async getInviteeByEventId(req: Request, res: Response): Promise<void> {
+    try {
+      const cacheKey = `data:${req.method}:${req.originalUrl}`;
+      const cacheData = await redisCache.get(cacheKey);
+  
+      if (cacheData) {
+        res.json({
+          message: "Cache: Invitees retrieved by event ID",
+          data: JSON.parse(cacheData),
+        });
+        return;
+      }
+  
+      const { eventId } = req.params;
+      const result = await this.inviteeService.getInviteeByEventId(eventId);
+      await redisCache.set(cacheKey, JSON.stringify(result), 360);
+  
+      res.json({ message: "API: Invitees retrieved by event ID", data: result });
+    } catch (error) {
+      res.status(500).json({ message: "An error occurred while fetching the invitees." });
+    }
+  }
+
   
 
   // Update an existing invitee by ID
