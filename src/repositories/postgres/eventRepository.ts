@@ -29,18 +29,21 @@ export class PostgresEventRepository implements IEventRepository {
   }
 
   async create(event: IEvent): Promise<IEvent> {
-    const eventId = uuidv4();
     const { id, user_id, event_name, event_datetime, location, description, created_at, updated_at } = event;
-
+  
     const { rows } = await queryWithLogging(
       this.pool,
-      `INSERT INTO events (id, user_id, event_name, event_datetime, location, description, created_at, updated_at)
+      `INSERT INTO events (
+        id, user_id, event_name, event_datetime, location, description, created_at, updated_at
+      )
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING *`,
-      [id,eventId, user_id, event_name, event_datetime, location, description, created_at, updated_at]
+      [id, user_id, event_name, event_datetime, location, description, created_at, updated_at]
     );
+  
     return rows[0];
   }
+  
 
   async update(id: string, event: IEvent): Promise<IEvent> {
     const { user_id, event_name, event_datetime, location, description, updated_at } = event;

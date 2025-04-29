@@ -31,11 +31,7 @@ export const validateIdInEvent = (
 };
 
 // Middleware to validate Event Object using Zod schema
-export const validateEvent = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void => {
+export const validateEvent = (req: Request,res: Response,next: NextFunction): void => {
   try {
     eventSchema.parse(req.body);
     next();
